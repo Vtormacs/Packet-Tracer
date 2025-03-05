@@ -1,0 +1,77 @@
+Pessoal, montei essa lista de comandos úteis para vocês. 
+Configurar RIPv2
+	Roteador0(config)#router rip
+	Roteador0(config-router)#version 2
+	Roteador0(config-router)#auto-summary
+	Roteador0(config-router)#network IP
+	Roteador0(config-router)#passive-interface 1/0
+
+
+
+Configurar Interface
+	Roteador0(config)#interface GigabitEthernet 0/0
+	Roteador0(config-if)#description NAME
+	Roteador0(config-if)#bandwidth 10/100/1000
+	Roteador0(config-if)#ip address IP MASK
+	Roteador0(config-if)#no shutdown
+
+Configurar OSPF
+	Roteador0(config)#router ospf PROCESSID
+	Roteador0(config-router)#log-adjacency-changes
+	Roteador0(config-router)#network IP !MASK(máscara invertida) area ID
+	Roteador0(config-router)#passive-interface 1/0
+
+Configurar VLANs
+	SWITCH
+		Switch(config)#vlan ID
+		Switch(config-vlan)#name NOME
+		!
+		Switch(config)#interface fastEthernet 0/0
+		Switch(config-if)#switchport mode access(ou trunk)
+
+			Caso seja ModeAccess
+				Switch(config-if)#switchport access vlan ID
+			Caso seja ModeTrunk
+				Switch(config-if)#switchport trunk allowed vlan all
+	
+	ROUTER
+		Roteador0(config)#interface GigabitEthernet0/1
+		Roteador0(config-if)#no ip address
+		Roteador0(config-if)#no shutdown
+
+		# Subinterfaces para VLANs
+			Roteador0(config)interface GigabitEthernet0/1.10
+			Roteador0(config-subif)encapsulation dot1Q 10
+			Roteador0(config-subif)ip address 192.168.10.1 255.255.255.0	
+			
+			
+Redistribuir Rotas entre RIPv2 e OSPF
+No roteador de Borda que contém os 2 protocolos
+Router(config)#router ospf 1
+Router(config-router)#redistribute rip subnets 
+Router(config-router)#exit
+Router(config)#router rip 
+Router(config-router)#version 2
+Router(config-router)#redistribute ospf 1 metric 2
+
+Config DHCP Relay
+Router(config)#interface fastEthernet 4/0
+Router(config-if)#ip helper-address IP
+Router(config-if)#
+
+Comandos diversos
+
+verificar configurações de execução 
+Router#sh running-config
+
+verificar tabela de roteamento
+Router#show ip route
+
+verificar tabela de roteamento RIPv2
+Router#show ip rip database 
+
+verificar tabela de roteamento OSPF
+Router#show ip ospf database
+
+limpar informações ospf e forçar reconvergencia
+Router#clear ip ospf process
